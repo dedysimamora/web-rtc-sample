@@ -1,0 +1,15 @@
+.smallVideo {
+    width: 20%;
+    position: relative;
+}
+
+.bigVideo {
+    position: absolute;
+    width: 90%;
+}
+
+
+.videoContainer {
+    width: 100%;
+    height: 100%;
+}
