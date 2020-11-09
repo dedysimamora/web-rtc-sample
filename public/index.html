@@ -40,4 +40,20 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+  <script>
+    var connection = new RTCMultiConnection();
+    
+    // this line is VERY_important
+    connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+    
+    // if you want audio+video conferencing
+    connection.session = {
+        audio: true,
+        video: true
+    };
+    
+    connection.openOrJoin('your-room-id');
+    </script>
+  <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
+  <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
 </html>
