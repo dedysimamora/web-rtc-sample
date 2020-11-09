@@ -1,4 +1,8 @@
 import React,{useEffect, useState} from "react"
+
+import VideoContainer from "./components/videoContainer"
+
+
 import './App.css';
 
 function App() {
@@ -14,8 +18,8 @@ function App() {
  
   }
   return (
-    <div className="App">
-      
+    <div className={'main-container'}>
+        <VideoContainer/>
     </div>
   );
 }
