@@ -1,15 +1,67 @@
 .smallVideo {
-    width: 20%;
-    position: relative;
+    width: 25%;
+    position: absolute;
+    border-radius: 10px;
+    border: 1px solid white;
+    top: 30px;
+    left: 20px;
 }
 
 .bigVideo {
-    position: absolute;
-    width: 90%;
+    position: absolute; 
+    right: 0; 
+    bottom: 0;
+    min-width: 100%; 
+    min-height: 100%;
+    width: auto; 
+    height: auto; 
+    background-size: cover;
+    overflow: hidden;
 }
 
 
 .videoContainer {
-    width: 100%;
+    width: 90%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.noCallerContainer {
+    width: 70%;
+    height: 70%;
+    background-color: rgb(245, 245, 245);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.control-div {
+    position: absolute !important;
+    bottom: 25px;
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    justify-content: center;
+}
+    
+
+.ant-input  {
+    width: 40% !important;
+    height: 50px !important;
+    border-radius: 20px !important;
+}
+
+.call-button {
+    height: 50px !important;
+    border-radius: 10px;
+    width: 20%;
+    margin-left: 20px;
+}
+
+.ant-btn-primary {
+    border-radius: 10px !important;
 }
