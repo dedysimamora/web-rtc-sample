@@ -5,6 +5,7 @@ import {UserOutlined} from '@ant-design/icons';
 import firebase from 'firebase/app'
 import 'firebase/database'
 import 'webrtc-adapter'
+import _ from 'lodash'
 import config from '../config'
 import { 
             doOffer, 
@@ -24,14 +25,17 @@ import {
 
         import {
             CloseOutlined,
-            RetweetOutlined
+            RetweetOutlined,
+            PhoneOutlined,
+            PoweroffOutlined
           } from '@ant-design/icons';
 
 import "./videoContainerFS.css"
 
+const userName = _.times(5, () => _.random(35).toString(36)).join('')
 const VideoContainerFS = () => {
     const [personID, setPersonID] = useState(null)
-    const [userName, setUserName] = useState(null)
+    const [callStatus, setCallStatus] = useState(false)
     const [database, setDatabase] = useState(null)
     const [swap, setSwap] = useState(false)
     const [isLogin,setIsLogin] = useState(false)
@@ -78,30 +82,39 @@ const VideoContainerFS = () => {
     
     const dialSomeone = async (username, userToCall) => {
         
-        listenToConnectionEvents(localConnection, username, userToCall, database, swap ? remoteVideoRef : localVideoRef, doCandidate)
+        listenToConnectionEvents(localConnection, username, userToCall, database, swap ? localVideoRef : remoteVideoRef, doCandidate)
         // create an offer
         createOffer(localConnection, localStream, userToCall, doOffer, database, username)
       }
+
+    const callSomeone = () => {
+        if(callStatus){
+            dialSomeone(userName,personID)
+            setCallStatus(!callStatus)
+        } else {
+            setCallStatus(!callStatus)
+        }
+
+    }
 
     const handleInputChange = (e) => {
         setPersonID(e.target.value);
     }
 
-    const handleInputUsername = (e) => {
-        setUserName(e.target.value);
+    const loginButtonFunc = () => {
+        if(!isLogin){
+            doLogin(userName, database, handleUpdate)
+            setIsLogin(true)
+        }
     }
 
-    const loginFunct = () => {
-        setIsLogin(true)
-        doLogin(userName, database, handleUpdate)
-    }
 
     const handleUpdate = (notif, username) => {
         if (notif) {
             switch (notif.type) {
               case 'offer':
                 setConnectedUser(notif.from)
-                listenToConnectionEvents(localConnection, username, notif.from, database,  swap ? remoteVideoRef : localVideoRef, doCandidate)
+                listenToConnectionEvents(localConnection, username, notif.from, database,  swap ? localVideoRef : remoteVideoRef, doCandidate)
                 sendAnswer(localConnection, localStream, notif, doAnswer, database, username)
                 break
               case 'answer':
@@ -124,6 +137,7 @@ const VideoContainerFS = () => {
         localVideoRef.current.srcObject = a
     }
     const closeConnection = () => {
+        localConnection.close()
         localStorage.setItem("videoStatus",false)
         remoteVideoRef.current.srcObject = null
         localVideoRef.current.srcObject = null
@@ -140,10 +154,27 @@ const VideoContainerFS = () => {
                     <div className={'noCallerContainer'}>
                          <UserOutlined style={{fontSize:'50px'}} />
                     </div>
+                    <div className={'userNamecontainer'}>
+
+                    <p className={'userNameText'}>{`Your ID : ${userName}`}</p>
+                    </div>
                     <div className={'control-div-fs'}>
-                        {/* <Button className={'call-button-fs'} onClick={() => dialSomeone(userName, personID)} type="primary">Call</Button> */}
-                        <Button className={'button-swap-fs'} onClick={changeCamera}  shape="circle" icon={<RetweetOutlined />} size={25} />
-                        <Button className={'button-close-fs'} onClick={closeConnection} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
+                        {
+                            callStatus 
+                            ? 
+                                <Input vvalue={personID} onChange={handleInputChange}  className={'person-id-fs'} placeholder="Destination UserID" />
+                            :
+                                (
+                                    <>
+                                        <Button className={'button-swap-fs'} onClick={changeCamera}  shape="circle" icon={<RetweetOutlined />} size={25} />
+                                        <Button className={'button-close-fs'} onClick={closeConnection} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
+                                    </>
+                                )
+                            
+                        }
+                        
+                        <Button className={'button-call-fs'} onClick={callSomeone} style={callStatus ? {backgroundColor:'#00CC00'} : {backgroundColor:'#358DC5'}}  shape="circle" icon={<PhoneOutlined className="phoneIcon" />} size={25} />
+                        <Button className={'login-call-fs'} onClick={loginButtonFunc} style={isLogin ? {backgroundColor:'#00CC00'} : {backgroundColor:'#7C7C7C'}}  shape="circle" icon={<PoweroffOutlined className="phoneIcon"  />} size={25} />
                     </div>
 
                 </div>

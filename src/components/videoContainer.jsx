@@ -26,6 +26,7 @@ import "./videoContainer.css"
 
 const VideoContainer = () => {
     const [personID, setPersonID] = useState(null)
+    const [swap, setSwap] = useState(false)
     const [userName, setUserName] = useState(null)
     const [database, setDatabase] = useState(null)
     const [isLogin,setIsLogin] = useState(false)
@@ -118,8 +119,8 @@ const VideoContainer = () => {
                 style={{display:'flex', justifyContent:'center', alignItems:'center'}}
             >
                 <div className={'videoContainer'}>
-                    <video className={'bigVideo'} ref={remoteVideoRef} autoPlay playsInline></video>
-                    <video className={'smallVideo'} ref={localVideoRef} autoPlay playsInline></video>
+                    <video muted={swap} className={'bigVideo'} ref={remoteVideoRef} autoPlay playsInline></video>
+                    <video muted={!swap}  className={'smallVideo'} ref={localVideoRef} autoPlay playsInline></video>
                     <div className={'noCallerContainer'}>
                          <UserOutlined style={{fontSize:'50px'}} />
                     </div>

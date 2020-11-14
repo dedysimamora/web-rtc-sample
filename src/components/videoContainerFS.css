@@ -1,8 +1,8 @@
 .smallVideo-fs {
     width: 20%;
-    position: absolute;
     border-radius: 10px;
     border: 1px solid white;
+    position: absolute;
     top: 50px;
     left:50px;
     background-color: darkgray;
@@ -52,7 +52,9 @@
 .person-id-fs  {
     width: 40% !important;
     height: 30px !important;
-    border-radius: 20px !important;
+    border-radius: 10px !important;
+    margin-right: 20px !important;
+    margin-top: 14px !important
 }
 
 .call-button-fs {
@@ -70,6 +72,15 @@
 .button-close-fs {
     width: 60px !important;
     height: 60px !important;
+    margin-right: 30px;
+}
+
+.button-call-fs {
+    width: 60px !important;
+    height: 60px !important;
+    color: white;
+    margin-right: 30px;
+    
 }
 
 .button-swap-fs {
@@ -78,4 +89,32 @@
     margin-right: 30px;
     color: white !important;
     background-color: darkgray !important ;
+}
+
+
+.phoneIcon svg {
+    color: white !important;
+}
+
+.login-call-fs {
+    width: 60px !important;
+    height: 60px !important;
+    color: white;
+    
+}
+
+
+
+.userNameText {
+    
+    color: black;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.userNamecontainer {
+    position: absolute;
+    top: 20px;
+    left:60px;
+    z-index: 9999;
 }
