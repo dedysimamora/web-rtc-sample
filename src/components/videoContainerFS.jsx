@@ -50,7 +50,7 @@ const VideoContainerFS = () => {
         if(connectionStatus == "disconnected") {
             setTimeout(() => {
                 window.parent.postMessage("connectionLost", "*");
-            }, 3000);
+            }, 1000);
         }
     }, [connectionStatus])
     
