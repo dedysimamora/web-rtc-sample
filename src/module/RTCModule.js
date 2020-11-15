@@ -27,7 +27,7 @@ export const initiateConnection = async () => {
   try {
     // using Google public stun server
     var configuration = {
-      iceServers: [{ urls: 'stun:stun2.1.google.com:19302' }]
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     }
 
     const conn = new RTCPeerConnection(configuration)

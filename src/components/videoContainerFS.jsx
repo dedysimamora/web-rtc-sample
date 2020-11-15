@@ -68,16 +68,6 @@ const VideoContainerFS = () => {
     }, [])
 
 
-    // const turnOnLocalVideo = async () => {
-    //         try {
-    //             const constraints = {'video': true, 'audio': true};
-    //             const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    //             const videoElement = localVideoRef.current
-    //             videoElement.srcObject = stream;
-    //         } catch(error) {
-    //             console.error('Error opening video camera.', error);
-    //         }
-    // }
 
     
     const dialSomeone = async (username, userToCall) => {
@@ -103,6 +93,8 @@ const VideoContainerFS = () => {
 
     const loginButtonFunc = () => {
         if(!isLogin){
+            sessionStorage.setItem('videoCallStatus', "true");
+            window.parent.postMessage("user login", "*");
             doLogin(userName, database, handleUpdate)
             setIsLogin(true)
         }
@@ -138,11 +130,12 @@ const VideoContainerFS = () => {
     }
     const closeConnection = () => {
         localConnection.close()
-        localStorage.setItem("videoStatus",false)
+        sessionStorage.setItem('videoCallStatus', "false");
+        window.parent.postMessage("user logout", "*");
         remoteVideoRef.current.srcObject = null
         localVideoRef.current.srcObject = null
     }
-    localStorage.setItem("videoStatus",true)
+    
     return (
         <Row style={{width:'100%', height:'100%'}}>
             <Col span={24}
@@ -166,15 +159,15 @@ const VideoContainerFS = () => {
                             :
                                 (
                                     <>
+                                        <Button className={'login-call-fs'} onClick={loginButtonFunc} style={isLogin ? {backgroundColor:'#00CC00'} : {backgroundColor:'#7C7C7C'}}  shape="circle" icon={<PoweroffOutlined className="phoneIcon"  />} size={25} />
                                         <Button className={'button-swap-fs'} onClick={changeCamera}  shape="circle" icon={<RetweetOutlined />} size={25} />
-                                        <Button className={'button-close-fs'} onClick={closeConnection} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
+                                        <Button disabled={!isLogin} className={'button-close-fs'} onClick={closeConnection} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
                                     </>
                                 )
                             
                         }
                         
-                        <Button className={'button-call-fs'} onClick={callSomeone} style={callStatus ? {backgroundColor:'#00CC00'} : {backgroundColor:'#358DC5'}}  shape="circle" icon={<PhoneOutlined className="phoneIcon" />} size={25} />
-                        <Button className={'login-call-fs'} onClick={loginButtonFunc} style={isLogin ? {backgroundColor:'#00CC00'} : {backgroundColor:'#7C7C7C'}}  shape="circle" icon={<PoweroffOutlined className="phoneIcon"  />} size={25} />
+                        <Button disabled={!isLogin} className={'button-call-fs'} onClick={callSomeone} style={callStatus ? {backgroundColor:'#00CC00'} : {backgroundColor:'#358DC5'}}  shape="circle" icon={<PhoneOutlined className="phoneIcon" />} size={25} />
                     </div>
 
                 </div>
