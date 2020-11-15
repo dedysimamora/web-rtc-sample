@@ -1,7 +1,7 @@
 import React,{useState, useEffect, useRef, createRef} from 'react'
 
 import { Card, Row, Col, Input, Button } from 'antd';
-import {UserOutlined} from '@ant-design/icons';
+import {SyncOutlined, SettingOutlined } from '@ant-design/icons';
 import firebase from 'firebase/app'
 import 'firebase/database'
 import 'webrtc-adapter'
@@ -34,7 +34,8 @@ import "./videoContainerFS.css"
 
 const userName = _.times(5, () => _.random(35).toString(36)).join('')
 const VideoContainerFS = () => {
-    const [personID, setPersonID] = useState(null)
+    const [personID, setPersonID] = useState("")
+    const [connectionStatus, setConnectionStatus] = useState(null)
     const [callStatus, setCallStatus] = useState(false)
     const [database, setDatabase] = useState(null)
     const [swap, setSwap] = useState(false)
@@ -44,6 +45,15 @@ const VideoContainerFS = () => {
     const [connectedUser, setConnectedUser] = useState(null)
     const localVideoRef = useRef();
     const remoteVideoRef = useRef();
+
+    useEffect(() => {
+        if(connectionStatus == "disconnected") {
+            setTimeout(() => {
+                window.parent.postMessage("connectionLost", "*");
+            }, 3000);
+        }
+    }, [connectionStatus])
+    
 
     useEffect(() => {
         
@@ -61,7 +71,7 @@ const VideoContainerFS = () => {
 
              await setLocalStream(localStream)
 
-            const localConnectionVariabel = await initiateConnection()
+            const localConnectionVariabel = await initiateConnection(setConnectionStatus)
             await setLocalConnection(localConnectionVariabel)
             // await doLogin('myusername', database, handleUpdate)
         })();
@@ -88,7 +98,7 @@ const VideoContainerFS = () => {
     }
 
     const handleInputChange = (e) => {
-        setPersonID(e.target.value);
+        setPersonID(e.target.value.toLowerCase());
     }
 
     const loginButtonFunc = () => {
@@ -96,6 +106,7 @@ const VideoContainerFS = () => {
             sessionStorage.setItem('videoCallStatus', "true");
             window.parent.postMessage("user login", "*");
             doLogin(userName, database, handleUpdate)
+            setConnectionStatus("alreadyLogin")
             setIsLogin(true)
         }
     }
@@ -131,7 +142,7 @@ const VideoContainerFS = () => {
     const closeConnection = () => {
         localConnection.close()
         sessionStorage.setItem('videoCallStatus', "false");
-        window.parent.postMessage("user logout", "*");
+        window.parent.postMessage("connectionClose", "*");
         remoteVideoRef.current.srcObject = null
         localVideoRef.current.srcObject = null
     }
@@ -144,8 +155,20 @@ const VideoContainerFS = () => {
                 <div className={'videoContainerFS'}>
                     <video muted={swap} className={'bigVideo-fs'} ref={remoteVideoRef} autoPlay playsInline></video>
                     <video muted={!swap} className={'smallVideo-fs'} ref={localVideoRef} autoPlay playsInline></video>
-                    <div className={'noCallerContainer'}>
-                         <UserOutlined style={{fontSize:'50px'}} />
+                    <div className={'noCallerContainer-fs'}>
+                        {
+                            connectionStatus == null
+                            ? <p className={'info-text'}>Press Login button</p>
+                            :  connectionStatus == "alreadyLogin"
+                            ? <p className={'info-text'}>Press call button for making a call, or wait until somone call you</p>
+                            : connectionStatus == "connecting"
+                            ? <p className={'info-text'}> <SyncOutlined className={'loadingSpin'} spin />Calling {personID}</p>
+                            :  connectionStatus == "disconected" || connectionStatus == "failed"
+                            ? <p className={'info-text'}> <SettingOutlined spin /> Bad connection {personID} </p>
+                            : null
+                        }
+                        
+                         {/* <UserOutlined style={{fontSize:'50px'}} /> */}
                     </div>
                     <div className={'userNamecontainer'}>
 
@@ -155,7 +178,7 @@ const VideoContainerFS = () => {
                         {
                             callStatus 
                             ? 
-                                <Input vvalue={personID} onChange={handleInputChange}  className={'person-id-fs'} placeholder="Destination UserID" />
+                                <Input maxLength={5} value={personID} onChange={handleInputChange}  className={'person-id-fs'} placeholder="Destination UserID" />
                             :
                                 (
                                     <>
@@ -167,7 +190,7 @@ const VideoContainerFS = () => {
                             
                         }
                         
-                        <Button disabled={!isLogin} className={'button-call-fs'} onClick={callSomeone} style={callStatus ? {backgroundColor:'#00CC00'} : {backgroundColor:'#358DC5'}}  shape="circle" icon={<PhoneOutlined className="phoneIcon" />} size={25} />
+                        <Button disabled={!isLogin || (callStatus && personID.length != 5) || connectionStatus == "connecting" } className={'button-call-fs'} onClick={callSomeone} shape="circle" icon={<PhoneOutlined className="phoneIcon" />} size={25} />
                     </div>
 
                 </div>

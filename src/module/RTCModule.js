@@ -23,14 +23,29 @@ export const initiateLocalStream = async () => {
     console.error(exception)
   }
 }
-export const initiateConnection = async () => {
+export const initiateConnection = async (changeConnectionStatus) => {
   try {
     // using Google public stun server
     var configuration = {
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        {url: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+    }
+      ]
     }
 
     const conn = new RTCPeerConnection(configuration)
+    conn.addEventListener('connectionstatechange', () => {
+      changeConnectionStatus(conn.connectionState)
+    })
+    conn.oniceconnectionstatechange = function() {
+      if(conn.iceConnectionState == 'disconnected') {
+          console.log('waaaaaaaaaaaaaaaaaaaaaaaaaaDisconnected');
+      }
+  }
+
     return conn
   } catch (exception) {
     console.log("apakah error bro ?");
