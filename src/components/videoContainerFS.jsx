@@ -1,7 +1,7 @@
 import React,{useState, useEffect, useRef, createRef} from 'react'
 
 import { Card, Row, Col, Input, Button, Modal } from 'antd';
-import {SyncOutlined, SettingOutlined } from '@ant-design/icons';
+import {SyncOutlined, SettingOutlined, RadarChartOutlined } from '@ant-design/icons';
 import firebase from 'firebase/app'
 import 'firebase/database'
 import 'webrtc-adapter'
@@ -35,7 +35,11 @@ import "./videoContainerFS.css"
 const userName = _.times(5, () => _.random(35).toString(36)).join('')
 const VideoContainerFS = () => {
     const [personID, setPersonID] = useState("")
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [modalData, setModalData] = useState({
+        visible: false,
+        text : "",
+        okButtonFunct : null
+    });
     const [connectionStatus, setConnectionStatus] = useState(null)
     const [callStatus, setCallStatus] = useState(false)
     const [database, setDatabase] = useState(null)
@@ -78,17 +82,31 @@ const VideoContainerFS = () => {
         })();
     }, [])
 
-    const showModal = () => {
-        setIsModalVisible(true);
-      };
-    
-      const handleOk = () => {
-        closeConnection()
-        setIsModalVisible(false);
+    const disconnectCall = () => {
+     
+        setModalData({
+            visible: true,
+            text : "Are You sure ? ",
+            okButtonFunct : closeConnection
+        })
       };
 
+      const testBrowser = () => {
+        
+        setModalData({
+            visible: true,
+            text : "browser Not Compatible ! ",
+            okButtonFunct : closeBrowserNotCompatible
+        })
+      };
+
+
       const handleCancel = () => {
-        setIsModalVisible(false);
+        setModalData({
+            visible: false,
+            text : "",
+            okButtonFunct : null
+        })
       };
 
 
@@ -158,6 +176,23 @@ const VideoContainerFS = () => {
         window.parent.postMessage("customerEndCall", "*");
         remoteVideoRef.current.srcObject = null
         localVideoRef.current.srcObject = null
+        setModalData({
+            visible: false,
+            text : "",
+            okButtonFunct : null
+        })
+    }
+
+    const closeBrowserNotCompatible = () => {
+        localConnection.close()
+        window.parent.postMessage("browserNotSupported", "*");
+        remoteVideoRef.current.srcObject = null
+        localVideoRef.current.srcObject = null
+        setModalData({
+            visible: false,
+            text : "",
+            okButtonFunct : null
+        })
     }
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -207,7 +242,8 @@ const VideoContainerFS = () => {
                                     <>
                                         <Button className={'login-call-fs'} onClick={loginButtonFunc} style={isLogin ? {backgroundColor:'#00CC00'} : {backgroundColor:'#7C7C7C'}}  shape="circle" icon={<PoweroffOutlined className="phoneIcon"  />} size={25} />
                                         <Button className={'button-swap-fs'} onClick={changeCamera}  shape="circle" icon={<RetweetOutlined />} size={25} />
-                                        <Button disabled={!isLogin} className={'button-close-fs'} onClick={showModal} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
+                                        <Button className={'button-swap-fs'} onClick={testBrowser}  shape="circle" icon={<RadarChartOutlined />} size={25} />
+                                        <Button disabled={!isLogin} className={'button-close-fs'} onClick={disconnectCall} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
                                     </>
                                 )
                             
@@ -221,11 +257,11 @@ const VideoContainerFS = () => {
                
             </Col>
             <Modal
-                visible={isModalVisible}
-                onOk={handleOk}
+                visible={modalData.visible}
+                onOk={modalData.okButtonFunct}
                 onCancel={handleCancel}
             >
-                    <h3>Are You sure ?</h3>
+                    <h3>{modalData.text}</h3>
                 </Modal>
         </Row>
             
