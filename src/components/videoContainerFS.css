@@ -117,6 +117,13 @@
     z-index: 9999;
 }
 
+.urlParams {
+    position: absolute;
+    top: 320px;
+    left:60px;
+    z-index: 9999;
+}
+
 .info-text {
     color: gray;
     font-size: 18px;

@@ -1,6 +1,6 @@
 import React,{useState, useEffect, useRef, createRef} from 'react'
 
-import { Card, Row, Col, Input, Button } from 'antd';
+import { Card, Row, Col, Input, Button, Modal } from 'antd';
 import {SyncOutlined, SettingOutlined } from '@ant-design/icons';
 import firebase from 'firebase/app'
 import 'firebase/database'
@@ -35,6 +35,7 @@ import "./videoContainerFS.css"
 const userName = _.times(5, () => _.random(35).toString(36)).join('')
 const VideoContainerFS = () => {
     const [personID, setPersonID] = useState("")
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState(null)
     const [callStatus, setCallStatus] = useState(false)
     const [database, setDatabase] = useState(null)
@@ -49,7 +50,7 @@ const VideoContainerFS = () => {
     useEffect(() => {
         if(connectionStatus == "disconnected") {
             setTimeout(() => {
-                window.parent.postMessage("connectionLost", "*");
+                window.parent.postMessage("vboEndCall", "*");
             }, 1000);
         }
     }, [connectionStatus])
@@ -76,6 +77,19 @@ const VideoContainerFS = () => {
             // await doLogin('myusername', database, handleUpdate)
         })();
     }, [])
+
+    const showModal = () => {
+        setIsModalVisible(true);
+      };
+    
+      const handleOk = () => {
+        closeConnection()
+        setIsModalVisible(false);
+      };
+
+      const handleCancel = () => {
+        setIsModalVisible(false);
+      };
 
 
 
@@ -141,11 +155,14 @@ const VideoContainerFS = () => {
     }
     const closeConnection = () => {
         localConnection.close()
-        sessionStorage.setItem('videoCallStatus', "false");
-        window.parent.postMessage("connectionClose", "*");
+        window.parent.postMessage("customerEndCall", "*");
         remoteVideoRef.current.srcObject = null
         localVideoRef.current.srcObject = null
     }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get('refNo');
+    console.log(myParam, "<<<<<<<<,,");
     
     return (
         <Row style={{width:'100%', height:'100%'}}>
@@ -171,9 +188,15 @@ const VideoContainerFS = () => {
                          {/* <UserOutlined style={{fontSize:'50px'}} /> */}
                     </div>
                     <div className={'userNamecontainer'}>
-
-                    <p className={'userNameText'}>{`Your ID : ${userName}`}</p>
+                        <p className={'userNameText'}>{`Your ID : ${userName}`}</p>
                     </div>
+                    {
+                        myParam !== null &&
+                        <div className={'urlParams'}>
+                            <p className={'userNameText'}>{`hased refnumber : ${myParam}`}</p>
+                         </div>
+                    }
+                    
                     <div className={'control-div-fs'}>
                         {
                             callStatus 
@@ -184,7 +207,7 @@ const VideoContainerFS = () => {
                                     <>
                                         <Button className={'login-call-fs'} onClick={loginButtonFunc} style={isLogin ? {backgroundColor:'#00CC00'} : {backgroundColor:'#7C7C7C'}}  shape="circle" icon={<PoweroffOutlined className="phoneIcon"  />} size={25} />
                                         <Button className={'button-swap-fs'} onClick={changeCamera}  shape="circle" icon={<RetweetOutlined />} size={25} />
-                                        <Button disabled={!isLogin} className={'button-close-fs'} onClick={closeConnection} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
+                                        <Button disabled={!isLogin} className={'button-close-fs'} onClick={showModal} type="danger" shape="circle" icon={<CloseOutlined />} size={25} />
                                     </>
                                 )
                             
@@ -197,6 +220,13 @@ const VideoContainerFS = () => {
                    
                
             </Col>
+            <Modal
+                visible={isModalVisible}
+                onOk={handleOk}
+                onCancel={handleCancel}
+            >
+                    <h3>Are You sure ?</h3>
+                </Modal>
         </Row>
             
             
