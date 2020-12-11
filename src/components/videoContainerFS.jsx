@@ -197,7 +197,8 @@ const VideoContainerFS = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const myParam = urlParams.get('refNo');
-    console.log(myParam, "<<<<<<<<,,");
+    const channelCode = urlParams.get('channelCode');
+    // console.log(myParam, "<<<<<<<<,,");
     
     return (
         <Row style={{width:'100%', height:'100%'}}>
@@ -228,7 +229,8 @@ const VideoContainerFS = () => {
                     {
                         myParam !== null &&
                         <div className={'urlParams'}>
-                            <p className={'userNameText'}>{`hased refnumber : ${myParam}`}</p>
+                            <p style={{wordBreak:'break-word'}} className={'userNameText'}>{`hased refnumber : ${myParam}`}</p>
+                            <p style={{wordBreak:'break-word'}} className={'userNameText'}>{`hased refnumber : ${channelCode}`}</p>
                          </div>
                     }
                     
